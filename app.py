@@ -15,9 +15,7 @@ class VideoTransformer(VideoProcessorBase):
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
 
-        img = cv2.cvtColor(
-            cv2.Canny(img, self.threshold1, self.threshold2), cv2.COLOR_GRAY2BGR
-        )
+        img = cv2.cvtColor(cv2.Canny(img, self.threshold1, self.threshold2), cv2.COLOR_GRAY2BGR)
 
         return img
 
@@ -25,19 +23,21 @@ class CameraFrame(VideoProcessorBase):
 
     def camera(self, frame):
         cam = frame.to_ndarray(format="bgr24")
-
+        cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         return cam
 
 
-playing = st.checkbox("Playing", value=True)
+playing1 = st.checkbox("Playing1", value=False)
 
 camf = webrtc_streamer(key="media-constraints1", video_processor_factory=CameraFrame,
-                        desired_playing_state=playing,
+                        desired_playing_state=playing1,
                         mode=WebRtcMode.SENDRECV,
                         rtc_configuration=RTC_CONFIGURATION)
 
+playing2 = st.checkbox("Playing2", value=False)
 ctx = webrtc_streamer(key="media-constraints2", video_processor_factory=VideoTransformer,
-                        desired_playing_state=playing,
+                        desired_playing_state=playing2,
                         mode=WebRtcMode.SENDRECV,
                         rtc_configuration=RTC_CONFIGURATION)
 
